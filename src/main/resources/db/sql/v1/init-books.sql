@@ -19,7 +19,7 @@ ALTER TABLE public.book ADD CONSTRAINT books_author_fk FOREIGN KEY (author_id) R
 -- данные
 INSERT INTO public.book (book_id, title, publication_date, publisher, isbn, author_id, reader_id)
 VALUES(nextval('seq_book'), 'Знак черырёх', 1975, 'Детгиз', '12345678', 1, 1),
-(nextval('seq_book'), 'Этюд в багровых тонах', 1975, 'Детгиз', '56789012', 1, 2),
-(nextval('seq_book'), 'Мастер и Маргарита', 1980, 'Книга', '23456789', 2, NULL),
-(nextval('seq_book'), 'Рассказы', 1982, 'Книга', '34567890', 3, NULL),
-(nextval('seq_book'), 'Дама с собачкой', 1983, 'Прогресс', '45678901', 3, NULL);
+      (nextval('seq_book'), 'Этюд в багровых тонах', 1975, 'Детгиз', '56789012', 1, 2),
+      (nextval('seq_book'), 'Мастер и Маргарита', 1980, 'Книга', '23456789', 2, NULL),
+      (nextval('seq_book'), 'Рассказы', 1982, 'Книга', '34567890', 3, NULL),
+      (nextval('seq_book'), 'Дама с собачкой', 1983, 'Прогресс', '45678901', 3, NULL);

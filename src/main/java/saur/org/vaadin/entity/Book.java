@@ -2,10 +2,13 @@ package saur.org.vaadin.entity;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 @Entity
 @Data
@@ -25,9 +28,10 @@ public class Book extends saur.org.vaadin.entity.Entity {
 
     private String publisher;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id")
-    private Author author;
+    @ManyToMany
+    @JoinTable(name="author_book", joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "author_id"))
+    private Set<Author> authors;
 
     @ManyToOne
     @JoinColumn(name = "reader_id")

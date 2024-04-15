@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class BookMainView {
     @Getter
-    private static String[] columnNames = new String[]{"Название", "Год издания", "Издательство", "Автор", "На руках у", "ISBN"};
+    private static String[] columnNames = new String[]{"Название", "Год издания", "Издательство", "Автор(ы)", "На руках у", "ISBN"};
 
     private String title;
 
@@ -16,7 +16,7 @@ public class BookMainView {
 
     private String publisher;
 
-    private String author;
+    private String authors;
 
     private String reader;
 

@@ -11,6 +11,6 @@ import saur.org.vaadin.repository.BookRepository;
 @PageTitle("Книги")
 public class BookListView extends GeneralListView<BookMainView> {
     public BookListView(BookRepository bookRepository) {
-       super(bookRepository.findAll().stream().map(BookMapper::entityToMainView).toList(), BookMainView.class);
+       super(bookRepository.findAllJoinAuthors().stream().map(BookMapper::entityToMainView).toList(), BookMainView.class);
     }
 }
