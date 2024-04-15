@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - property:
+      name: versionV1
+      value: v1
+
+  - property:
+      name: sqlDirV1
+      value: ../sql/${versionV1}
+
+  - changeSet:
+      id: ${versionV1}/init-authors
+      author: alexey.laristov@mail.ru
+      sqlFile:
+        path: ${sqlDirV1}/init-authors.sql
+        relativeToChangelogFile: true
+  - changeSet:
+      id: ${versionV1}/init-books
+      author: alexey.laristov@mail.ru
+      sqlFile:
+        path: ${sqlDirV1}/init-books.sql
+        relativeToChangelogFile: true
