@@ -47,8 +47,5 @@ public class MainLayout extends AppLayout {
         addToDrawer(new VerticalLayout(
                 new RouterLink(Book.getENTITY_NAME(), BookListView.class)
         ));
-        addToDrawer(new VerticalLayout(
-                new RouterLink("Chart", ChartTypeBar.class)
-        ));
     }
 }

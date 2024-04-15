@@ -15,17 +15,10 @@ import lombok.NoArgsConstructor;
 public class Author extends saur.org.vaadin.entity.Entity {
     @Getter
     private static String ENTITY_NAME = "Авторы";
-    @Getter
-    private static String[] columnNames = new String[]{"Имя", "Фамилия"};
-
-    public Author(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
 
     @Id
     @GeneratedValue
-    private Integer id;
+    private Integer authorId;
 
     private String firstName;
 

@@ -9,6 +9,6 @@ import saur.org.vaadin.repository.ReaderRepository;
 @PageTitle("Читатели")
 public class ReaderListView extends GeneralListView<Reader> {
     public ReaderListView(ReaderRepository readerRepository) {
-        super(readerRepository, Reader.class);
+        super(readerRepository.findAll(), Reader.class);
     }
 }

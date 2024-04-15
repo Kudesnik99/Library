@@ -32,7 +32,7 @@ public class MainView extends VerticalLayout {
     private final String BUTTON_WIDTH = "123px";
 
     public MainView(AuthorRepository authorRepository) {
-        grid.addColumn(Author::getId).setHeader("ID").setSortable(true).setWidth("20px");
+        grid.addColumn(Author::getAuthorId).setHeader("ID").setSortable(true).setWidth("20px");
         grid.addColumn(Author::getFirstName).setHeader("First name").setSortable(true);
         grid.addColumn(Author::getLastName).setHeader("Last name").setSortable(true);
         List<Author> data = authorRepository.findAll();
@@ -47,7 +47,7 @@ public class MainView extends VerticalLayout {
                 Author selectedCustomer = selected.getFirstSelectedItem().get();
                 name.setValue(selectedCustomer.getFirstName());
                 lastName.setValue(selectedCustomer.getLastName());
-                authorId = selectedCustomer.getId();
+                authorId = selectedCustomer.getAuthorId();
             }
         });
 

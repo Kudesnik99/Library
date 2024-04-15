@@ -16,16 +16,11 @@ public class Reader extends saur.org.vaadin.entity.Entity {
     @Getter
     private static String ENTITY_NAME = "Читатели";
     @Getter
-    private static String[] columnNames = new String[]{"Имя", "Фамилия"};
-
-    public Reader(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
+    private static String[] columnNames = new String[]{"Id", "Имя", "Фамилия"};
 
     @Id
     @GeneratedValue
-    private Integer id;
+    private Integer readerId;
 
     private String firstName;
 

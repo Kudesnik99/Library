@@ -19,11 +19,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
-public class GeneralListView<T extends Entity> extends VerticalLayout {
+public class GeneralListView<T> extends VerticalLayout {
     private Grid<T> grid; // = new Grid<>();
     private final TextField filterText = new TextField();
 
-    public GeneralListView(JpaRepository<T, Long> repository, Class<T> cls) { //String[] columnNames) {
+    public GeneralListView(List<T> data, Class<T> cls) { //String[] columnNames) {
         grid = new Grid<>(cls, false);
         addClassName("list-view");
         setSizeFull();
@@ -31,15 +31,16 @@ public class GeneralListView<T extends Entity> extends VerticalLayout {
         String[] columnHeaders;
         List<String> columnNames;
         try {
-            columnNames = Arrays.stream(cls.getDeclaredFields()).filter(field -> !Modifier.isStatic(field.getModifiers())).map(Field::getName).collect(Collectors.toList());
+            columnNames = Arrays.stream(cls.getDeclaredFields())
+                    .filter(field -> !Modifier.isStatic(field.getModifiers())).map(Field::getName).collect(Collectors.toList());
             columnHeaders = (String[])cls.getMethod("getColumnNames").invoke(null);
-            for (int i = 0; i < columnNames.size() - 1; i++) {
-                columns.add(new AbstractMap.SimpleEntry<>(columnNames.get(i + 1), columnHeaders[i]));
+            for (int i = 0; i < columnNames.size(); i++) {
+                columns.add(new AbstractMap.SimpleEntry<>(columnNames.get(i), columnHeaders[i]));
             }
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-        configureGrid(repository.findAll(), columns);
+        configureGrid(data, columns);
         add(getToolbar(), grid);
     }
 

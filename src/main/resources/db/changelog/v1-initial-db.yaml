@@ -19,3 +19,9 @@ databaseChangeLog:
       sqlFile:
         path: ${sqlDirV1}/init-books.sql
         relativeToChangelogFile: true
+  - changeSet:
+      id: ${versionV1}/init-readers
+      author: alexey.laristov@mail.ru
+      sqlFile:
+        path: ${sqlDirV1}/init-readers.sql
+        relativeToChangelogFile: true
