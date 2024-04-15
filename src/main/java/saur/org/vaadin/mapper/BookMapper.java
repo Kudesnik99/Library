@@ -10,8 +10,8 @@ public class BookMapper {
                 bookEntity.getTitle(),
                 bookEntity.getPublicationDate(),
                 bookEntity.getPublisher(),
-                bookEntity.getAuthor().getFirstName() + " " + bookEntity.getAuthor().getLastName(),
-                ObjectUtils.isEmpty(bookEntity.getReaderId()) ? "" : String.valueOf(bookEntity.getReaderId()),
+                ObjectUtils.isEmpty(bookEntity.getAuthor()) ? "" : bookEntity.getAuthor().getFirstName() + " " + bookEntity.getAuthor().getLastName(),
+                ObjectUtils.isEmpty(bookEntity.getReader()) ? "" : bookEntity.getReader().getFirstName() + " " + bookEntity.getReader().getLastName(),
                 bookEntity.getISBN()
                 );
     }

@@ -29,7 +29,9 @@ public class Book extends saur.org.vaadin.entity.Entity {
     @JoinColumn(name = "author_id")
     private Author author;
 
-    private Integer readerId;
+    @ManyToOne
+    @JoinColumn(name = "reader_id")
+    private Reader reader;
 
     private String ISBN;
 }

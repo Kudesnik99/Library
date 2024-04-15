@@ -7,3 +7,9 @@ CREATE TABLE public.reader (
                               last_name varchar NULL,
                               CONSTRAINT readers_pk PRIMARY KEY (reader_id)
 );
+
+INSERT INTO public.reader (reader_id, first_name, last_name)
+VALUES(nextval('seq_reader'), 'Алексей', 'Ларистов'),
+      (nextval('seq_reader'), 'Ольга', 'Афанасьева'),
+      (nextval('seq_reader'), 'Константин', 'Федотов'),
+      (nextval('seq_reader'), 'Катя', 'Собачкина');
