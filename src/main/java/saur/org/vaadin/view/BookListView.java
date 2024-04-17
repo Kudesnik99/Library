@@ -16,6 +16,7 @@ public class BookListView extends GeneralListView<BookDto> {
     @Getter
     private static final String VIEW_NAME = "Книги";
     private static final String MORE_TWO_AUTHORS = "Больше 2-х авторов";
+    private static final String BORROWED_BOOKS = "Книги на руках";
     private static final String ALL = "Все";
 
     private final BookRepository bookRepository;
@@ -28,8 +29,9 @@ public class BookListView extends GeneralListView<BookDto> {
 
         var all = new Tab(ALL);
         var moreThreeAuthors = new Tab(MORE_TWO_AUTHORS);
+        var borrowedBooks = new Tab(BORROWED_BOOKS);
 
-        Tabs tabs = new Tabs(all, moreThreeAuthors);
+        Tabs tabs = new Tabs(all, moreThreeAuthors, borrowedBooks);
         tabs.addSelectedChangeListener(getTabsListener());
         this.addAttachListener(getAttachListener(VIEW_NAME));
         applyLayout(tabs);
@@ -46,6 +48,8 @@ public class BookListView extends GeneralListView<BookDto> {
                             grid.setItems(bookRepository.findAllJoinAuthors().stream().map(BookMapper::entityToMainView).toList());
                     case MORE_TWO_AUTHORS ->
                             grid.setItems(bookRepository.findMoreThenNAuthors(2).stream().map(BookMapper::entityToMainView).toList());
+                    case BORROWED_BOOKS ->
+                            grid.setItems(bookRepository.findBorrowedBooks().stream().map(BookMapper::entityToMainView).toList());
                 }
             }
         };
