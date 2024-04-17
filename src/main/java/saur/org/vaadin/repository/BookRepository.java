@@ -12,7 +12,13 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("select b from Book b join fetch b.authors")
     List<Book> findAllJoinAuthors();
 
-//    @Query("select b.bookId from Book b join fetch b.authors group by b.bookId having count(b.bookId) >= ?1")
+
+    @Query("select b from Book b join fetch b.authors where b.bookId in (select ab.bookId from AuthorBook ab group by ab.bookId having count(ab.bookId) >= ?1)")
+    List<Book> findMoreThenNAuthors(int N);
+
+
+
+    //    @Query("select b.bookId from Book b join fetch b.authors group by b.bookId having count(b.bookId) >= ?1")
 //    @Query("select b from Book b where b.bookId in (select ba.bookId from Book b join fetch b.authors group by b.bookId having count(b.bookId) >= 2)")
 
 //    @Query( value = "SELECT b1_0.book_id, b1_0.isbn, a1_0.book_id, a1_1.author_id, a1_1.first_name, a1_1.last_name, " +
@@ -21,8 +27,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 //            "join author a1_1 on a1_1.author_id=a1_0.author_id " +
 //            "where b1_0.book_id in (select ab.book_id from author_book ab group by ab.book_id having count(ab.book_id) >= 2)",
 //        nativeQuery = true)
-    @Query("select b from Book b join fetch b.authors where b.bookId in (select ab.bookId from AuthorBook ab group by ab.bookId having count(ab.bookId) >= 2)")
-    List<Book> findMoreThenNAuthors(); //int N);
 
     // select book_id from author_book group by book_id having count(book_id) >= 2;
 

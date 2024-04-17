@@ -25,10 +25,8 @@ public class BookListView extends GeneralListView<BookMainView> {
 
         var all = new Tab(ALL);
         var moreThreeAuthors = new Tab(MORE_TWO_AUTHORS);
-        var query2 = new Tab("Query2");
-        var query3 = new Tab("Query3");
 
-        Tabs tabs = new Tabs(all, moreThreeAuthors, query2, query3);
+        Tabs tabs = new Tabs(all, moreThreeAuthors);
         tabs.addSelectedChangeListener(getTabsListener());
         applyLayout(tabs);
     }
@@ -39,7 +37,7 @@ public class BookListView extends GeneralListView<BookMainView> {
             public void onComponentEvent(Tabs.SelectedChangeEvent selectedChangeEvent) {
                 switch (selectedChangeEvent.getSelectedTab().getLabel()) {
                     case ALL -> grid.setItems(bookRepository.findAllJoinAuthors().stream().map(BookMapper::entityToMainView).toList());
-                    case MORE_TWO_AUTHORS -> grid.setItems(bookRepository.findMoreThenNAuthors().stream().map(BookMapper::entityToMainView).toList());
+                    case MORE_TWO_AUTHORS -> grid.setItems(bookRepository.findMoreThenNAuthors(2).stream().map(BookMapper::entityToMainView).toList());
                 }
                 System.out.println(">>> " + selectedChangeEvent.getSelectedTab().getLabel());
             }
