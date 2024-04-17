@@ -9,7 +9,14 @@ import saur.org.vaadin.repository.ReaderRepository;
 @Route(value="Reader", layout = MainLayout.class)
 @PageTitle("Читатели")
 public class ReaderListView extends GeneralListView<ReaderMainView> {
+
+    private final ReaderRepository readerRepository;
+
     public ReaderListView(ReaderRepository readerRepository) {
-        super(readerRepository.findAll().stream().map(ReaderMapper::entityToMainView).toList(), ReaderMainView.class);
+        super(ReaderMainView.class);
+        this.readerRepository = readerRepository;
+        configureGrid();
+        grid.setItems(this.readerRepository.findAll().stream().map(ReaderMapper::entityToMainView).toList());
+        applyLayout();
     }
 }

@@ -9,7 +9,7 @@ import saur.org.vaadin.enums.ColumnDecorationType;
 @AllArgsConstructor
 public class ReaderMainView {
     @Getter
-    private static String[] columnNames = new String[]{"Id", "Имя", "Фамилия"};
+    private static String[] columnNames = new String[]{"Имя", "Фамилия"};
 
     @Getter
     private static ColumnDecorationType[] columnDecorations = new ColumnDecorationType[]{null, null};

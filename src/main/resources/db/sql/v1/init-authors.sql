@@ -11,4 +11,5 @@ CREATE TABLE public.author (
 INSERT INTO public.author (author_id, first_name, last_name)
 VALUES(nextval('seq_author'), 'Конан', 'Дойл'),
 (nextval('seq_author'), 'Михаил', 'Булгаков'),
-(nextval('seq_author'), 'Антон', 'Чехов');
+(nextval('seq_author'), 'Антон', 'Чехов'),
+(nextval('seq_author'), 'Дэн', 'Браун');
