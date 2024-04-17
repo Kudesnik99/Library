@@ -1,11 +1,9 @@
 package saur.org.vaadin.entity;
 
-import jakarta.persistence.*;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Set;
@@ -14,10 +12,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class Book extends saur.org.vaadin.entity.Entity {
-    @Getter
-    private static String ENTITY_NAME = "Книги";
-
+public class Book {
     @Id
     @GeneratedValue
     private Integer bookId;

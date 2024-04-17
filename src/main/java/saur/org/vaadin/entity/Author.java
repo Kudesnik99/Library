@@ -12,10 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class Author extends saur.org.vaadin.entity.Entity {
-    @Getter
-    private static String ENTITY_NAME = "Авторы";
-
+public class Author {
     @Id
     @GeneratedValue
     private Integer authorId;

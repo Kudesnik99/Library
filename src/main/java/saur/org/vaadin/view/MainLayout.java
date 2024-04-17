@@ -40,13 +40,13 @@ public class MainLayout extends AppLayout {
 
     private void createDrawer() {
         addToDrawer(new VerticalLayout(
-                new RouterLink(Author.getENTITY_NAME(), AuthorListView.class)
+                new RouterLink(AuthorListView.getVIEW_NAME(), AuthorListView.class)
         ));
         addToDrawer(new VerticalLayout(
-                new RouterLink(Reader.getENTITY_NAME(), ReaderListView.class)
+                new RouterLink(ReaderListView.getVIEW_NAME(), ReaderListView.class)
         ));
         addToDrawer(new VerticalLayout(
-                new RouterLink(Book.getENTITY_NAME(), BookListView.class)
+                new RouterLink(BookListView.getVIEW_NAME(), BookListView.class)
         ));
     }
 }

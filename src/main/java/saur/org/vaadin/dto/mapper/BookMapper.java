@@ -1,12 +1,12 @@
-package saur.org.vaadin.mapper;
+package saur.org.vaadin.dto.mapper;
 
 import org.springframework.util.ObjectUtils;
-import saur.org.vaadin.dto.BookMainView;
+import saur.org.vaadin.dto.BookDto;
 import saur.org.vaadin.entity.Book;
 
 public class BookMapper {
-    public static BookMainView entityToMainView (Book bookEntity) {
-        return new BookMainView(
+    public static BookDto entityToMainView (Book bookEntity) {
+        return new BookDto(
                 bookEntity.getTitle(),
                 bookEntity.getPublicationDate(),
                 bookEntity.getPublisher(),

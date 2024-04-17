@@ -2,21 +2,25 @@ package saur.org.vaadin.view;
 
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import saur.org.vaadin.dto.ReaderMainView;
-import saur.org.vaadin.mapper.ReaderMapper;
+import lombok.Getter;
+import saur.org.vaadin.dto.ReaderDto;
+import saur.org.vaadin.dto.mapper.ReaderMapper;
 import saur.org.vaadin.repository.ReaderRepository;
 
 @Route(value="Reader", layout = MainLayout.class)
 @PageTitle("Читатели")
-public class ReaderListView extends GeneralListView<ReaderMainView> {
+public class ReaderListView extends GeneralListView<ReaderDto> {
+    @Getter
+    private static final String VIEW_NAME = "Читатели";
 
     private final ReaderRepository readerRepository;
 
     public ReaderListView(ReaderRepository readerRepository) {
-        super(ReaderMainView.class);
+        super(ReaderDto.class);
         this.readerRepository = readerRepository;
         configureGrid();
         grid.setItems(this.readerRepository.findAll().stream().map(ReaderMapper::entityToMainView).toList());
+        this.addAttachListener(getAttachListener(VIEW_NAME));
         applyLayout();
     }
 }

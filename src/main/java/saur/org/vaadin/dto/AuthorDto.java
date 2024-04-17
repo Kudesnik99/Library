@@ -7,7 +7,7 @@ import saur.org.vaadin.enums.ColumnDecorationType;
 
 @Data
 @AllArgsConstructor
-public class ReaderMainView {
+public class AuthorDto {
     @Getter
     private static String[] columnNames = new String[]{"Имя", "Фамилия"};
 

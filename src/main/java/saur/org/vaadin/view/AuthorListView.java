@@ -5,22 +5,24 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import saur.org.vaadin.dto.AuthorMainView;
-import saur.org.vaadin.mapper.AuthorMapper;
-import saur.org.vaadin.mapper.BookMapper;
+import lombok.Getter;
+import saur.org.vaadin.dto.AuthorDto;
+import saur.org.vaadin.dto.mapper.AuthorMapper;
 import saur.org.vaadin.repository.AuthorRepository;
 
 @Route(value="", layout = MainLayout.class)
 @PageTitle("Авторы")
-public class AuthorListView extends GeneralListView<AuthorMainView> {
+public class AuthorListView extends GeneralListView<AuthorDto> {
+    @Getter
+    private static final String VIEW_NAME = "Авторы";
 
-    private final String MOST_POPULAR = "Топ 3 читаемых авторов";
-    private final String ALL = "Все";
+    private static final String MOST_POPULAR = "Топ 3 читаемых авторов";
+    private static final String ALL = "Все";
 
     private final AuthorRepository authorRepository;
 
     public AuthorListView(AuthorRepository authorRepository) {
-        super(AuthorMainView.class);
+        super(AuthorDto.class);
         this.authorRepository = authorRepository;
         configureGrid();
         grid.setItems(this.authorRepository.findAll().stream().map(AuthorMapper::entityToMainView).toList());
@@ -30,6 +32,7 @@ public class AuthorListView extends GeneralListView<AuthorMainView> {
 
         Tabs tabs = new Tabs(all, mostPopular);
         tabs.addSelectedChangeListener(getTabsListener());
+        this.addAttachListener(getAttachListener(VIEW_NAME));
         applyLayout(tabs);
     }
 

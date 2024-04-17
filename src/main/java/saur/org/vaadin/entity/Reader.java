@@ -3,20 +3,15 @@ package saur.org.vaadin.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class Reader extends saur.org.vaadin.entity.Entity {
-    @Getter
-    private static String ENTITY_NAME = "Читатели";
-
+public class Reader {
     @Id
     @GeneratedValue
     private Integer readerId;
