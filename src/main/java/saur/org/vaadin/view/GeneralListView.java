@@ -10,7 +10,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.web.client.RestTemplate;
 import saur.org.vaadin.enums.ColumnDecorationType;
 
 import java.lang.reflect.Field;
@@ -19,7 +18,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
@@ -49,9 +47,11 @@ public class GeneralListView<T> extends VerticalLayout {
             grid.setSizeFull();
             for (int i = 0; i < columnNames.size(); i++) {
                 Grid.Column<?> gridColumn = grid.addColumn(columnNames.get(i)).setHeader(columnHeaders[i]).setSortable(true).setAutoWidth(true);
-                if (columnDecorations[i] == ColumnDecorationType.WRAPPED) {
-                    gridColumn.addClassName(LumoUtility.FlexWrap.WRAP);
-                }
+                Optional.of(columnDecorations[i]).ifPresent(decoration -> {
+                    if (ObjectUtils.isNotEmpty(decoration.getStyles())) {
+                        decoration.getStyles().forEach(gridColumn::addClassName);
+                    }
+                });
             }
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -81,14 +81,15 @@ public class GeneralListView<T> extends VerticalLayout {
             Optional<Component> optionalHeader = component.getChildren().filter(it -> it instanceof HorizontalLayout).findFirst();
             optionalHeader.ifPresent(header -> {
                 Optional<Component> optionalLogo = header.getChildren().filter(it -> it instanceof H1).findFirst();
-                optionalLogo.ifPresent(h1 -> { H1 logo = (H1)h1;
+                optionalLogo.ifPresent(h1 -> {
+                    H1 logo = (H1) h1;
                     logo.removeFromParent();
                     H1 refreshedLogo = new H1(logo.getText().replaceAll(": .*", "") + ": " + viewName);
                     refreshedLogo.addClassNames(
                             LumoUtility.FontSize.LARGE,
                             LumoUtility.Margin.MEDIUM);
 
-                    ((HorizontalLayout)header).add(refreshedLogo);
+                    ((HorizontalLayout) header).add(refreshedLogo);
                 });
 
             });

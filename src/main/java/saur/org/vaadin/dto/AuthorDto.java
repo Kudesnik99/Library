@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import saur.org.vaadin.enums.ColumnDecorationType;
 
+import static saur.org.vaadin.enums.ColumnDecorationType.ORDINARY;
+
 @Data
 @AllArgsConstructor
 public class AuthorDto {
@@ -12,7 +14,7 @@ public class AuthorDto {
     private static String[] columnNames = new String[]{"Имя", "Фамилия"};
 
     @Getter
-    private static ColumnDecorationType[] columnDecorations = new ColumnDecorationType[]{null, null};
+    private static ColumnDecorationType[] columnDecorations = new ColumnDecorationType[]{ORDINARY, ORDINARY};
 
     private String firstName;
 
