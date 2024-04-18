@@ -18,7 +18,6 @@ public class ReaderListView extends GeneralListView<ReaderDto> {
     public ReaderListView(ReaderRepository readerRepository) {
         super(ReaderDto.class);
         this.readerRepository = readerRepository;
-        configureGrid();
         grid.setItems(this.readerRepository.findAllJoinBooks().stream().map(ReaderMapper::entityToMainView).toList());
         this.addAttachListener(getAttachListener(VIEW_NAME));
         applyLayout();

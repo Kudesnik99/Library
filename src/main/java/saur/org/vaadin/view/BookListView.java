@@ -1,6 +1,7 @@
 package saur.org.vaadin.view;
 
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
@@ -24,17 +25,22 @@ public class BookListView extends GeneralListView<BookDto> {
     public BookListView(BookRepository bookRepository) {
         super(BookDto.class);
         this.bookRepository = bookRepository;
-        configureGrid();
         grid.setItems(this.bookRepository.findAllJoinAuthors().stream().map(BookMapper::entityToMainView).toList());
 
         var all = new Tab(ALL);
         var moreThreeAuthors = new Tab(MORE_TWO_AUTHORS);
         var borrowedBooks = new Tab(BORROWED_BOOKS);
-
         Tabs tabs = new Tabs(all, moreThreeAuthors, borrowedBooks);
         tabs.addSelectedChangeListener(getTabsListener());
+        tabs.setWidthFull();
+
+        Button addButton = new Button("Добавить");
+        addButton.addClickListener(click -> {
+            // ToDo: Написать добавление записи
+        });
+
         this.addAttachListener(getAttachListener(VIEW_NAME));
-        applyLayout(tabs);
+        applyLayout(tabs, addButton);
     }
 
 

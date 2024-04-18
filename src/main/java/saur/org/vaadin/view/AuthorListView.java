@@ -24,7 +24,6 @@ public class AuthorListView extends GeneralListView<AuthorDto> {
     public AuthorListView(AuthorRepository authorRepository) {
         super(AuthorDto.class);
         this.authorRepository = authorRepository;
-        configureGrid();
         grid.setItems(this.authorRepository.findAll().stream().map(AuthorMapper::entityToMainView).toList());
 
         var all = new Tab(ALL);
