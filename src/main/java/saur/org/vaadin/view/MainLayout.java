@@ -3,15 +3,11 @@ package saur.org.vaadin.view;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import saur.org.vaadin.entity.Author;
-import saur.org.vaadin.entity.Book;
-import saur.org.vaadin.entity.Reader;
 
 public class MainLayout extends AppLayout {
 

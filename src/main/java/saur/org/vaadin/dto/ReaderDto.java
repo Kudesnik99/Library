@@ -3,23 +3,20 @@ package saur.org.vaadin.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-import saur.org.vaadin.enums.ColumnDecorationType;
-
-import static saur.org.vaadin.enums.ColumnDecorationType.ORDINARY;
-import static saur.org.vaadin.enums.ColumnDecorationType.WRAPPED;
+import saur.org.vaadin.dto.annotation.Title;
 
 @Data
 @AllArgsConstructor
 public class ReaderDto {
     @Getter
-    private static String[] columnNames = new String[]{"Имя", "Фамилия", "Книги на руках"};
+    private static final String SUB_TITLE = "Читатели";
 
-    @Getter
-    private static ColumnDecorationType[] columnDecorations = new ColumnDecorationType[]{ORDINARY, ORDINARY, WRAPPED};
-
+    @Title("Имя")
     private String firstName;
 
+    @Title("Фамилия")
     private String lastName;
 
+    @Title("Книги на руках")
     private String books;
 }

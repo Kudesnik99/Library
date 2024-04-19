@@ -1,31 +1,34 @@
 package saur.org.vaadin.dto;
 
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-import saur.org.vaadin.enums.ColumnDecorationType;
-
-import static saur.org.vaadin.enums.ColumnDecorationType.ORDINARY;
-import static saur.org.vaadin.enums.ColumnDecorationType.WRAPPED;
+import saur.org.vaadin.dto.annotation.Style;
+import saur.org.vaadin.dto.annotation.Title;
 
 @Data
 @AllArgsConstructor
 public class BookDto {
     @Getter
-    private static String[] columnNames = new String[]{"Название", "Год издания", "Издательство", "Автор(ы)", "На руках у", "ISBN"};
+    private static final String SUB_TITLE = "Книги";
 
-    @Getter
-    private static ColumnDecorationType[] columnDecorations = new ColumnDecorationType[]{ORDINARY, ORDINARY, ORDINARY, WRAPPED, ORDINARY, ORDINARY};
-
+    @Title("Название")
     private String title;
 
+    @Title("Год издания")
     private Integer publicationDate;
 
+    @Title("Издательство")
     private String publisher;
 
+    @Style(LumoUtility.FlexWrap.WRAP)
+    @Title("Автор(ы)")
     private String authors;
 
+    @Title("Наруках у")
     private String reader;
 
+    @Title("ISBN")
     private String ISBN;
 }
