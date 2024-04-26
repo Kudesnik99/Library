@@ -132,7 +132,11 @@ public class GeneralListView<T> extends Component {
                         hiddenFields++;
                         continue;
                     }
-                    columnsConfig.columnSetters.get(i).invoke(item, textFields.get(i - hiddenFields).getValue());
+                    if (columnsConfig.parametersTypes[i] == Integer.class) {
+                        columnsConfig.columnSetters.get(i).invoke(item, Integer.valueOf(textFields.get(i - hiddenFields).getValue()));
+                    } else {
+                        columnsConfig.columnSetters.get(i).invoke(item, textFields.get(i - hiddenFields).getValue());
+                    }
 
                 }
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException ex) {

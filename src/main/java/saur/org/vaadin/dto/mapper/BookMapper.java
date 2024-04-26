@@ -9,7 +9,6 @@ import saur.org.vaadin.repository.AuthorRepository;
 import saur.org.vaadin.repository.ReaderRepository;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 public class BookMapper {
@@ -24,16 +23,19 @@ public class BookMapper {
                                 .reduce("", (subtotal, element) -> ObjectUtils.isEmpty(subtotal) ? element : subtotal + "; " + element),
                 ObjectUtils.isEmpty(bookEntity.getReader()) ? "" : bookEntity.getReader().getFirstName() + " " + bookEntity.getReader().getLastName(),
                 bookEntity.getISBN()
-                );
+        );
     }
 
     public static Book mainViewToEntity(BookDto bookDto, AuthorRepository authorRepository, ReaderRepository readerRepository) {
         Set<Author> authors = authorRepository.findAuthorByLastNameInAndFirstNameIn(
                 Arrays.stream(bookDto.getAuthors().split("; ")).map(author -> author.split(" ")[1]).toList(),
                 Arrays.stream(bookDto.getAuthors().split("; ")).map(author -> author.split(" ")[0]).toList());
-        Reader reader = readerRepository.findReaderByLastNameInAndFirstNameIn(
-                Arrays.stream(bookDto.getReader().split("; ")).map(author -> author.split(" ")[1]).toList(),
-                Arrays.stream(bookDto.getReader().split("; ")).map(author -> author.split(" ")[0]).toList());
+        Reader reader = null;
+        if (!ObjectUtils.isEmpty(bookDto.getReader())) {
+            reader = readerRepository.findReaderByLastNameInAndFirstNameIn(
+                    Arrays.stream(bookDto.getReader().split("; ")).map(author -> author.split(" ")[1]).toList(),
+                    Arrays.stream(bookDto.getReader().split("; ")).map(author -> author.split(" ")[0]).toList());
+        }
         return new Book(
                 bookDto.getBookId(),
                 bookDto.getTitle(),
