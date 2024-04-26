@@ -3,18 +3,18 @@ package saur.org.vaadin.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.SequenceGenerator;
+import lombok.*;
 
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
+@AllArgsConstructor
 public class Author {
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "seq_author")
+    @SequenceGenerator(name = "seq_author", allocationSize = 1)
     private Integer authorId;
 
     private String firstName;

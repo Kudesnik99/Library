@@ -11,6 +11,9 @@ public class AuthorDto {
     @Getter
     private static final String SUB_TITLE = "Авторы";
 
+    @Title("HIDDEN")
+    private Integer authorId;
+
     @Title("Имя")
     private String firstName;
 

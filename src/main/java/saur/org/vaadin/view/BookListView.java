@@ -6,7 +6,10 @@ import com.vaadin.flow.router.Route;
 import lombok.Getter;
 import saur.org.vaadin.dto.BookDto;
 import saur.org.vaadin.dto.mapper.BookMapper;
+import saur.org.vaadin.dto.mapper.ReaderMapper;
+import saur.org.vaadin.repository.AuthorRepository;
 import saur.org.vaadin.repository.BookRepository;
+import saur.org.vaadin.repository.ReaderRepository;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,7 +29,7 @@ public class BookListView extends VerticalLayout {
     private final BookRepository bookRepository;
 
 
-    public BookListView(BookRepository bookRepository) {
+    public BookListView(BookRepository bookRepository, AuthorRepository authorRepository, ReaderRepository readerRepository) {
         this.bookRepository = bookRepository;
 
         Map<String, Supplier<List<BookDto>>> tabsConfig = new LinkedHashMap<>();
@@ -34,7 +37,8 @@ public class BookListView extends VerticalLayout {
         tabsConfig.put(MORE_TWO_AUTHORS, () -> bookRepository.findMoreThenNAuthors(2).stream().map(BookMapper::entityToMainView).toList());
         tabsConfig.put(BORROWED_BOOKS, () -> bookRepository.findBorrowedBooks().stream().map(BookMapper::entityToMainView).toList());
 
-        GeneralListView<BookDto> generalListView = new GeneralListView<>(tabsConfig, BookDto.class, tabsConfig.get(ALL).get());
+        GeneralListView<BookDto> generalListView = new GeneralListView<>(tabsConfig, BookDto.class, tabsConfig.get(ALL),
+                (record) -> bookRepository.save(BookMapper.mainViewToEntity(record, authorRepository, readerRepository)));
         setSizeFull();
         add(generalListView.getLayoutComponents());
     }

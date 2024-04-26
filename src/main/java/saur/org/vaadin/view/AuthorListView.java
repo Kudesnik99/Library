@@ -20,19 +20,14 @@ public class AuthorListView extends VerticalLayout {
     private static final String VIEW_NAME = "Авторы";
 
     private static final String ALL = "Все";
-    private static final String MOST_POPULAR = "Топ 3 читаемых авторов";
-
-
-    private final AuthorRepository authorRepository;
-
+    private static final String MOST_POPULAR = "Топ 2 читаемых авторов";
     public AuthorListView(AuthorRepository authorRepository) {
-        this.authorRepository = authorRepository;
-
         Map<String, Supplier<List<AuthorDto>>> tabsConfig = new LinkedHashMap<>();
-        tabsConfig.put(ALL, () -> this.authorRepository.findAll().stream().map(AuthorMapper::entityToMainView).toList());
+        tabsConfig.put(ALL, () -> authorRepository.findAll().stream().map(AuthorMapper::entityToMainView).toList());
         tabsConfig.put(MOST_POPULAR, () -> authorRepository.findPopularAuthors(2).stream().map(AuthorMapper::entityToMainView).toList());
 
-        GeneralListView<AuthorDto> generalListView = new GeneralListView<>(tabsConfig, AuthorDto.class, tabsConfig.get(ALL).get());
+        GeneralListView<AuthorDto> generalListView = new GeneralListView<>(tabsConfig, AuthorDto.class, tabsConfig.get(ALL),
+                (record) -> authorRepository.save(AuthorMapper.mainViewToEntity(record)));
         setSizeFull();
         add(generalListView.getLayoutComponents());
     }

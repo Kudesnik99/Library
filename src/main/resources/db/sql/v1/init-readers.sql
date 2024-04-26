@@ -12,4 +12,5 @@ INSERT INTO public.reader (reader_id, first_name, last_name)
 VALUES(nextval('seq_reader'), 'Алексей', 'Ларистов'),
       (nextval('seq_reader'), 'Ольга', 'Афанасьева'),
       (nextval('seq_reader'), 'Константин', 'Федотов'),
-      (nextval('seq_reader'), 'Катя', 'Собачкина');
+      (nextval('seq_reader'), 'Катя', 'Собачкина'),
+      (nextval('seq_reader'), 'Алексей', 'Васильев');

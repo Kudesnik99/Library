@@ -2,6 +2,7 @@ package saur.org.vaadin.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -12,9 +13,11 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
+@AllArgsConstructor
 public class Book {
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "seq_book")
+    @SequenceGenerator(name = "seq_book", allocationSize = 1)
     private Integer bookId;
 
     private String title;

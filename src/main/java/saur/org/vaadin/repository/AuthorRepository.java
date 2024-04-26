@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import saur.org.vaadin.entity.Author;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Long> {
@@ -22,6 +23,8 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
             "order by r.count desc limit ?1",
     nativeQuery = true)
     List<Author> findPopularAuthors(int N);
+
+    Set<Author> findAuthorByLastNameInAndFirstNameIn(List<String> lastNames, List<String> firstNames);
 
     // select r.first_name, r.last_name, r.count from (select a.first_name, a.last_name, a.author_id, count(*)
     // from author a join author_book ab on a.author_id=ab.author_id

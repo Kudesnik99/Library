@@ -6,8 +6,15 @@ import saur.org.vaadin.entity.Author;
 public class AuthorMapper {
     public static AuthorDto entityToMainView (Author authorEntity) {
         return new AuthorDto(
+                authorEntity.getAuthorId(),
                 authorEntity.getFirstName(),
                 authorEntity.getLastName()
         );
+    }
+
+    public static Author mainViewToEntity (AuthorDto authorDto) {
+        return new Author(authorDto.getAuthorId(),
+                authorDto.getFirstName(),
+                authorDto.getLastName());
     }
 }

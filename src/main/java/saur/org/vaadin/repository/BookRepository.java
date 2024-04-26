@@ -19,7 +19,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("select b from Book b join fetch b.authors where b.reader is not null")
     List<Book> findBorrowedBooks();
 
-
+    List<Book> findBooksByTitleIn(List<String> titles);
 
     //    @Query("select b.bookId from Book b join fetch b.authors group by b.bookId having count(b.bookId) >= ?1")
 //    @Query("select b from Book b where b.bookId in (select ba.bookId from Book b join fetch b.authors group by b.bookId having count(b.bookId) >= 2)")

@@ -6,18 +6,22 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import saur.org.vaadin.dto.annotation.Style;
@@ -28,23 +32,29 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Tag("universalView")
 public class GeneralListView<T> extends Component {
 
-    private Grid<T> grid;
-    private final NativeLabel validationMessage = new NativeLabel();
     private final HorizontalLayout toolbar;
+    private Grid<T> grid;
+    private final NativeLabel validationMessage;
     private final Class<T> cls;
+    private final ColumnsConfig columnsConfig;
 
-    public GeneralListView(Map<String, Supplier<List<T>>> tabsConfig, Class<T> cls, List<T> initialData) {
+    @SneakyThrows
+    public GeneralListView(Map<String, Supplier<List<T>>> tabsConfig, Class<T> cls, Supplier<List<T>> readMethod, Consumer<T> saveMethod) {
         this.cls = cls;
+        String subTitle = (String) cls.getMethod("getSUB_TITLE").invoke(null);
+        columnsConfig = new ColumnsConfig();
         addClassName("list-view");
-        toolbar = createToolbar(createTabs(tabsConfig), new Button("Добавить"));
-        grid = createGrid(initialData);
-        configureGridColumns();
+        toolbar = createToolbar(createTabs(tabsConfig), createAddButton(subTitle, readMethod, saveMethod));
+        grid = createGrid(readMethod, saveMethod, subTitle);
+        validationMessage = new NativeLabel();
     }
 
     public Component[] getLayoutComponents() {
@@ -58,10 +68,82 @@ public class GeneralListView<T> extends Component {
             Arrays.stream(toolBarComponents).forEach(component -> {
                 if (component != null) toolbar.add(component);
             });
-//            toolbar.add(toolBarComponents);
         }
         toolbar.addClassName("toolbar");
         return toolbar;
+    }
+
+    private Grid<T> createGrid(Supplier<List<T>> readMethod, Consumer<T> saveMethod, String subTitle) {
+        grid = new Grid<>(cls, false);
+        grid.addClassNames("contact-grid");
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        grid.setSizeFull();
+        grid.addAttachListener(getAttachListener(subTitle, readMethod));
+        Editor<T> editor = grid.getEditor();
+        Binder<T> binder = new Binder<>(cls);
+        editor.setBinder(binder);
+        editor.setBuffered(true);
+        editor.addCancelListener(e -> validationMessage.setText(""));
+        prepareDataColumns(binder);
+        prepareControlColumn(editor, saveMethod);
+        return grid;
+    }
+    private Button createAddButton(String subTitle, Supplier<List<T>> readMethod, Consumer<T> saveMethod) {
+        return new Button("Добавить", e -> {
+            Dialog dialog = new Dialog();
+            dialog.setHeaderTitle(subTitle);
+
+            VerticalLayout dialogLayout = createDialogLayout();
+            dialog.add(dialogLayout);
+
+            Button saveButton = createSaveButton(dialog, readMethod, saveMethod);
+            Button cancelButton = new Button("Cancel", cancelEvent -> dialog.close());
+            dialog.getFooter().add(cancelButton);
+            dialog.getFooter().add(saveButton);
+            dialog.open();
+        });
+    }
+    private VerticalLayout createDialogLayout() {
+        VerticalLayout dialogLayout = new VerticalLayout();
+        dialogLayout.setPadding(false);
+        dialogLayout.setSpacing(false);
+        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+        dialogLayout.getStyle().set("width", "18rem").set("max-width", "100%");
+
+        for (int i = 0; i < columnsConfig.columnNames.size(); i++) {
+            if (Title.HIDDEN.equals(columnsConfig.columnTitles.get(i))) continue;
+            TextField dialogField = new TextField(columnsConfig.columnTitles.get(i));
+            dialogLayout.add(dialogField);
+        }
+
+        return dialogLayout;
+    }
+
+    private Button createSaveButton(Dialog dialog, Supplier<List<T>> readMethod, Consumer<T> saveMethod) {
+        Button saveButton = new Button("Add", clickEvent -> {
+            List<TextField> textFields = dialog.getChildren().findFirst().map(Component::getChildren)
+                    .orElse(Stream.empty()).map(field -> (TextField) field).toList();
+            T item;
+            try {
+                item = cls.getDeclaredConstructor(columnsConfig.parametersTypes).newInstance(columnsConfig.parameters);
+                int hiddenFields = 0;
+                for (int i = 0; i < columnsConfig.fieldsCount; i++) {
+                    if (Title.HIDDEN.equals(columnsConfig.columnTitles.get(i))) {
+                        hiddenFields++;
+                        continue;
+                    }
+                    columnsConfig.columnSetters.get(i).invoke(item, textFields.get(i - hiddenFields).getValue());
+
+                }
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException ex) {
+                throw new RuntimeException(ex);
+            }
+            saveMethod.accept(item);
+            dialog.close();
+            grid.setItems(readMethod.get());
+        });
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        return saveButton;
     }
 
     private Tabs createTabs(Map<String, Supplier<List<T>>> tabsConfig) {
@@ -73,61 +155,48 @@ public class GeneralListView<T> extends Component {
         return tabs;
     }
 
-    private Grid<T> createGrid(List<T> data) {
-        grid = new Grid<>(cls, false);
-        grid.addClassNames("contact-grid");
-        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        grid.setSizeFull();
-        grid.setItems(data);
-        String subTitle;
-        try {
-            subTitle = (String) cls.getMethod("getSUB_TITLE").invoke(null);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-        grid.addAttachListener(getAttachListener(subTitle));
-        return grid;
-    }
+    private class ColumnsConfig {
+        private final List<String> columnNames = new ArrayList<>();
+        private final List<Method> columnGetters = new ArrayList<>();
+        private final List<String> columnTitles = new ArrayList<>();
+        private final List<Method> columnSetters = new ArrayList<>();
+        private final List<Set<String>> columnStyles = new ArrayList<>();
+        private final Object[] parameters;
+        private final Class<?>[] parametersTypes;
+        private final int fieldsCount;
 
-    private void configureGridColumns() {
-        List<String> columnNames = new ArrayList<>();
-        List<Method> columnGetters = new ArrayList<>();
-        List<String> columnTitles = new ArrayList<>();
-        List<Method> columnSetters = new ArrayList<>();
-        List<Set<String>> columnStyles = new ArrayList<>();
+        @SneakyThrows
+        private ColumnsConfig() {
+            List<Field> fields = Arrays.stream(cls.getDeclaredFields()).filter(field -> !Modifier.isStatic(field.getModifiers())).toList();
+            parameters = new Object[fields.size()];
+            parametersTypes = new Class[fields.size()];
+            fieldsCount = fields.size();
 
-        try {
-            for (Field field : cls.getDeclaredFields()) {
-                if (!Modifier.isStatic(field.getModifiers())) {
-                    columnNames.add(field.getName());
-                    if (field.isAnnotationPresent(Style.class)) {
-                        columnTitles.add(field.getAnnotation(Title.class).value());
-                    } else columnTitles.add(null);
-                    columnGetters.add(cls.getDeclaredMethod("get" + StringUtils.capitalize(field.getName())));
-                    columnSetters.add(cls.getDeclaredMethod("set" + StringUtils.capitalize(field.getName()), field.getType()));
-                    if (field.isAnnotationPresent(Style.class)) {
-                        columnStyles.add(Arrays.stream(field.getAnnotation(Style.class).value()).collect(Collectors.toSet()));
-                    } else columnStyles.add(null);
+            for (int i = 0; i < fieldsCount; i++) {
+                Field field = fields.get(i);
+                columnNames.add(field.getName());
+                if (field.isAnnotationPresent(Title.class)) {
+                    columnTitles.add(field.getAnnotation(Title.class).value());
+                } else columnTitles.add(null);
+                columnGetters.add(cls.getDeclaredMethod("get" + StringUtils.capitalize(field.getName())));
+                columnSetters.add(cls.getDeclaredMethod("set" + StringUtils.capitalize(field.getName()), field.getType()));
+                if (field.isAnnotationPresent(Style.class)) {
+                    columnStyles.add(Arrays.stream(field.getAnnotation(Style.class).value()).collect(Collectors.toSet()));
+                } else columnStyles.add(null);
+                Class<?> type = fields.get(i).getType();
+                parametersTypes[i] = type;
+                if (type.equals(Integer.class)) {
+                    parameters[i] = null;
+                } else {
+                    parameters[i] = type.getDeclaredConstructor().newInstance();
                 }
             }
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
         }
-
-        Editor<T> editor = grid.getEditor();
-        Binder<T> binder = new Binder<>(cls);
-        editor.setBinder(binder);
-        editor.setBuffered(true);
-        editor.addCancelListener(e -> validationMessage.setText(""));
-
-        prepareDataColumns(columnNames, columnGetters, columnTitles, columnSetters, columnStyles, binder);
-        prepareControlColumn(editor);
-
     }
 
-    private void prepareControlColumn(Editor<T> editor) {
+    private void prepareControlColumn(Editor<T> editor, Consumer<T> saveMethod) {
         Grid.Column<T> editColumn = grid.addComponentColumn(record -> {
-            Button editButton = new Button("Edit", VaadinIcon.EDIT.create());
+            Button editButton = new Button("Изменить", VaadinIcon.EDIT.create());
             editButton.addClickListener(e -> {
                 if (editor.isOpen())
                     editor.cancel();
@@ -136,8 +205,12 @@ public class GeneralListView<T> extends Component {
             return editButton;
         });
 
-        Button saveButton = new Button("Save", VaadinIcon.CHECK.create(), e -> {
-            if (editor.save()) grid.getDataProvider().refreshAll();
+        Button saveButton = new Button("Сохранить", VaadinIcon.CHECK.create(), e -> {
+            T item = editor.getItem();
+            if (editor.save()) {
+                grid.getDataProvider().refreshAll();
+                if (saveMethod != null) saveMethod.accept(item);
+            }
         });
         Button cancelButton = new Button(VaadinIcon.CLOSE.create(),
                 e -> editor.cancel());
@@ -149,14 +222,14 @@ public class GeneralListView<T> extends Component {
         editColumn.setEditorComponent(actions);
     }
 
-    private void prepareDataColumns(List<String> columnNames, List<Method> columnGetters, List<String> columnTitles,
-                                    List<Method> columnSetters, List<Set<String>> columnStyles, Binder<T> binder) {
-        for (int i = 0; i < columnNames.size(); i++) {
-            if (Title.HIDDEN.equals(columnTitles.get(i))) continue;
-            Grid.Column<T> gridColumn = grid.addColumn(columnNames.get(i))
-                    .setHeader(columnTitles.get(i) != null ? columnTitles.get(i) : columnNames.get(i)).setSortable(true).setAutoWidth(true);
+    private void prepareDataColumns(Binder<T> binder) {
+        for (int i = 0; i < columnsConfig.columnNames.size(); i++) {
+            if (Title.HIDDEN.equals(columnsConfig.columnTitles.get(i))) continue;
+            Grid.Column<T> gridColumn = grid.addColumn(columnsConfig.columnNames.get(i))
+                    .setHeader(columnsConfig.columnTitles.get(i) != null ? columnsConfig.columnTitles.get(i) :
+                            columnsConfig.columnNames.get(i)).setSortable(true).setAutoWidth(true);
 
-            Optional.ofNullable(columnStyles.get(i)).ifPresent(decoration -> {
+            Optional.ofNullable(columnsConfig.columnStyles.get(i)).ifPresent(decoration -> {
                 if (ObjectUtils.isNotEmpty(decoration)) {
                     decoration.forEach(gridColumn::addClassName);
                 }
@@ -165,8 +238,8 @@ public class GeneralListView<T> extends Component {
             TextField textField = new TextField();
             textField.setWidthFull();
 
-            Method getter = columnGetters.get(i);
-            Method setter = columnSetters.get(i);
+            Method getter = columnsConfig.columnGetters.get(i);
+            Method setter = columnsConfig.columnSetters.get(i);
             binder.forField(textField)
 //                    .asRequired("Поле не может быть пустым")
 //                    .withStatusLabel(validationMessage)
@@ -222,10 +295,11 @@ public class GeneralListView<T> extends Component {
         }
     }
 
-    protected ComponentEventListener<AttachEvent> getAttachListener(String viewName) {
+    private ComponentEventListener<AttachEvent> getAttachListener(String viewName, Supplier<List<T>> readMethod) {
         return attachEvent -> {
             Component component = attachEvent.getSource();
             refreshHeader(component, viewName);
+            grid.setItems(readMethod.get());
         };
     }
 }

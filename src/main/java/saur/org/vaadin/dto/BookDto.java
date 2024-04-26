@@ -13,6 +13,9 @@ public class BookDto {
     @Getter
     private static final String SUB_TITLE = "Книги";
 
+    @Title("HIDDEN")
+    private Integer bookId;
+
     @Title("Название")
     private String title;
 
