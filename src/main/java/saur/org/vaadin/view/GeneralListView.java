@@ -24,6 +24,8 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import saur.org.vaadin.dto.annotation.Style;
 import saur.org.vaadin.dto.annotation.Title;
 
@@ -47,13 +49,14 @@ public class GeneralListView<T> extends Component {
     private final ColumnsConfig columnsConfig;
 
     @SneakyThrows
-    public GeneralListView(Map<String, Supplier<List<T>>> tabsConfig, Class<T> cls, Supplier<List<T>> readMethod, Consumer<T> saveMethod) {
+    public GeneralListView(Map<String, Supplier<List<T>>> tabsConfig, Class<T> cls,
+                           Supplier<List<T>> readMethod, Consumer<T> saveMethod, Consumer<T> deleteMethod) {
         this.cls = cls;
         String subTitle = (String) cls.getMethod("getSUB_TITLE").invoke(null);
         columnsConfig = new ColumnsConfig();
         addClassName("list-view");
         toolbar = createToolbar(createTabs(tabsConfig), createAddButton(subTitle, readMethod, saveMethod));
-        grid = createGrid(readMethod, saveMethod, subTitle);
+        grid = createGrid(readMethod, saveMethod, deleteMethod, subTitle);
         validationMessage = new NativeLabel();
     }
 
@@ -73,7 +76,7 @@ public class GeneralListView<T> extends Component {
         return toolbar;
     }
 
-    private Grid<T> createGrid(Supplier<List<T>> readMethod, Consumer<T> saveMethod, String subTitle) {
+    private Grid<T> createGrid(Supplier<List<T>> readMethod, Consumer<T> saveMethod, Consumer<T> deleteMethod, String subTitle) {
         grid = new Grid<>(cls, false);
         grid.addClassNames("contact-grid");
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
@@ -85,9 +88,10 @@ public class GeneralListView<T> extends Component {
         editor.setBuffered(true);
         editor.addCancelListener(e -> validationMessage.setText(""));
         prepareDataColumns(binder);
-        prepareControlColumn(editor, saveMethod);
+        prepareControlColumn(editor, readMethod, saveMethod, deleteMethod);
         return grid;
     }
+
     private Button createAddButton(String subTitle, Supplier<List<T>> readMethod, Consumer<T> saveMethod) {
         return new Button("Добавить", e -> {
             Dialog dialog = new Dialog();
@@ -103,6 +107,7 @@ public class GeneralListView<T> extends Component {
             dialog.open();
         });
     }
+
     private VerticalLayout createDialogLayout() {
         VerticalLayout dialogLayout = new VerticalLayout();
         dialogLayout.setPadding(false);
@@ -139,7 +144,8 @@ public class GeneralListView<T> extends Component {
                     }
 
                 }
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException ex) {
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                     InstantiationException ex) {
                 throw new RuntimeException(ex);
             }
             saveMethod.accept(item);
@@ -198,7 +204,7 @@ public class GeneralListView<T> extends Component {
         }
     }
 
-    private void prepareControlColumn(Editor<T> editor, Consumer<T> saveMethod) {
+    private void prepareControlColumn(Editor<T> editor, Supplier<List<T>> readMethod, Consumer<T> saveMethod, Consumer<T> deleteMethod) {
         Grid.Column<T> editColumn = grid.addComponentColumn(record -> {
             Button editButton = new Button("Изменить", VaadinIcon.EDIT.create());
             editButton.addClickListener(e -> {
@@ -206,7 +212,25 @@ public class GeneralListView<T> extends Component {
                     editor.cancel();
                 grid.getEditor().editItem(record);
             });
-            return editButton;
+
+            HorizontalLayout buttons = new HorizontalLayout(editButton);
+            if (deleteMethod != null) {
+                Button deleteButton = new Button("Удалить", VaadinIcon.DEL.create());
+                deleteButton.addClickListener(e -> {
+                    try {
+                        deleteMethod.accept(record);
+                        grid.setItems(readMethod.get());
+                    } catch (ConstraintViolationException | DataIntegrityViolationException exception) {
+                        Dialog messageBox = new Dialog();
+                        messageBox.add(new VerticalLayout(new NativeLabel("Нельзя удалить запись! Есть связанные данные."), new Button("Закрыть", event -> messageBox.close())));
+                        messageBox.setModal(false);
+                        messageBox.setDraggable(true);
+                        messageBox.open();
+                    }
+                });
+                buttons.add(deleteButton);
+            }
+            return buttons;
         });
 
         Button saveButton = new Button("Сохранить", VaadinIcon.CHECK.create(), e -> {

@@ -30,7 +30,7 @@ public class ReaderListView extends VerticalLayout {
 
         GeneralListView<ReaderDto> generalListView = new GeneralListView<>(tabsConfig, ReaderDto.class,
                 () -> readerRepository.findAllJoinBooks().stream().map(ReaderMapper::entityToMainView).toList(),
-                (record) -> readerRepository.save(ReaderMapper.mainViewToEntity(record, bookRepository)));
+                (record) -> readerRepository.save(ReaderMapper.mainViewToEntity(record, bookRepository)), null);
         setSizeFull();
         add(generalListView.getLayoutComponents());
     }

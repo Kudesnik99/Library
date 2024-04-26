@@ -27,7 +27,8 @@ public class AuthorListView extends VerticalLayout {
         tabsConfig.put(MOST_POPULAR, () -> authorRepository.findPopularAuthors(2).stream().map(AuthorMapper::entityToMainView).toList());
 
         GeneralListView<AuthorDto> generalListView = new GeneralListView<>(tabsConfig, AuthorDto.class, tabsConfig.get(ALL),
-                (record) -> authorRepository.save(AuthorMapper.mainViewToEntity(record)));
+                record -> authorRepository.save(AuthorMapper.mainViewToEntity(record)),
+                record -> authorRepository.delete(AuthorMapper.mainViewToEntity(record)));
         setSizeFull();
         add(generalListView.getLayoutComponents());
     }

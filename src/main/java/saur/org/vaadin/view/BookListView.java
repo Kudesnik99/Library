@@ -38,7 +38,7 @@ public class BookListView extends VerticalLayout {
         tabsConfig.put(BORROWED_BOOKS, () -> bookRepository.findBorrowedBooks().stream().map(BookMapper::entityToMainView).toList());
 
         GeneralListView<BookDto> generalListView = new GeneralListView<>(tabsConfig, BookDto.class, tabsConfig.get(ALL),
-                (record) -> bookRepository.save(BookMapper.mainViewToEntity(record, authorRepository, readerRepository)));
+                (record) -> bookRepository.save(BookMapper.mainViewToEntity(record, authorRepository, readerRepository)), null);
         setSizeFull();
         add(generalListView.getLayoutComponents());
     }
